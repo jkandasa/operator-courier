@@ -46,13 +46,13 @@ class PushCmd():
             return result64
 
     def _push_to_registry(self, namespace, repository, release, bundle, auth_token):
-        push_uri = 'https://quay.io/cnr/api/v1/packages/%s/%s' % (namespace, repository)
+        push_uri = 'https://%s/cnr/api/v1/packages/%s/%s' % (os.environ.get('QUAY_HOSTNAME', 'quay.io'), namespace, repository)
         logger.info('Pushing bundle to %s' % push_uri)
         headers = {'Content-Type': 'application/json', 'Authorization': auth_token}
         json = {'blob': bundle, 'release': release, "media_type": "helm"}
 
         try:
-            r = requests.post(push_uri, json=json, headers=headers)
+            r = requests.post(push_uri, json=json, headers=headers, verify=False)
         except requests.RequestException as e:
             msg = str(e)
             logger.error(msg)
